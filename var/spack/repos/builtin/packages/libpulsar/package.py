@@ -19,11 +19,13 @@ class Libpulsar(CMakePackage):
             sha256='5bf8e5115075e12c848a9e4474cd47067c3200f7ff13c45f624f7383287e8e5e')
 
     depends_on('zstd')
+    depends_on('openssl')
+    depends_on('snappy')
     depends_on('boost')
     depends_on('protobuf')
     depends_on('pkg-config')
     depends_on('openssl')
-    depends_on('cmake @3.14:', type='build')
+    depends_on('cmake@3.14:', type='build')
 
     root_cmakelists_dir = 'pulsar-client-cpp'
 
