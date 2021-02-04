@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+import os
 from spack import *
 
 
@@ -18,6 +19,8 @@ class Libpulsar(CMakePackage):
     version('2.7.0',
             sha256='5bf8e5115075e12c848a9e4474cd47067c3200f7ff13c45f624f7383287e8e5e')
 
+    variant('python', default=False, description='Build the Python client')
+
     depends_on('zstd')
     depends_on('openssl')
     depends_on('snappy')
@@ -27,8 +30,22 @@ class Libpulsar(CMakePackage):
     depends_on('openssl')
     depends_on('cmake@3.14:', type='build')
 
+    extends('python'          , when='+python')
+
+    depends_on('boost+python' , when='+python')
+    depends_on('python'       , type=('build'), when='+python')
+    depends_on('py-setuptools', type=('build'), when='+python')
+    depends_on('py-wheel'     , type=('build'), when='+python')
+
     root_cmakelists_dir = 'pulsar-client-cpp'
 
     def cmake_args(self):
-        args = ["-DBUILD_PYTHON_WRAPPER=OFF", "-DBUILD_TESTS=OFF"]
+        args = ["-DBUILD_TESTS=OFF"]
         return args
+
+    @run_after('build')
+    def build_python_whl(self):
+        if '+python' in self.spec:
+            with working_dir(os.path.join(self.stage.source_path, 'pulsar-client-cpp/python')):
+                python = self.spec['python'].command
+                python('setup.py', 'bdist_wheel')
