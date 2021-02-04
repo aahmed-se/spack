@@ -1,0 +1,48 @@
+From 2713b61360b66a7a3e0297556dfd48f842a66200 Mon Sep 17 00:00:00 2001
+From: Ali Ahmed <alahmed.se@gmail.com>
+Date: Thu, 4 Feb 2021 14:03:57 -0800
+Subject: [PATCH] Add support for python 39
+
+---
+ pulsar-client-cpp/CMakeLists.txt        | 2 +-
+ pulsar-client-cpp/python/CMakeLists.txt | 7 ++++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/pulsar-client-cpp/CMakeLists.txt b/pulsar-client-cpp/CMakeLists.txt
+index d4fdb8e9495..b5502403fb6 100644
+--- a/pulsar-client-cpp/CMakeLists.txt
++++ b/pulsar-client-cpp/CMakeLists.txt
+@@ -170,7 +170,7 @@ if (BUILD_PYTHON_WRAPPER)
+         list(GET PYTHONLIBS_VERSION_NO_LIST 1 PYTHONLIBS_VERSION_MINOR)
+         set(BOOST_PYTHON_NAME_POSTFIX ${PYTHONLIBS_VERSION_MAJOR}${PYTHONLIBS_VERSION_MINOR})
+         # For python3 the lib name is boost_python3
+-        set(BOOST_PYTHON_NAME_LIST python36;python37;python38;python3;python3-mt;python-py${BOOST_PYTHON_NAME_POSTFIX};python${BOOST_PYTHON_NAME_POSTFIX}-mt;python${BOOST_PYTHON_NAME_POSTFIX})
++        set(BOOST_PYTHON_NAME_LIST python36;python37;python38;python39;python3;python3-mt;python-py${BOOST_PYTHON_NAME_POSTFIX};python${BOOST_PYTHON_NAME_POSTFIX}-mt;python${BOOST_PYTHON_NAME_POSTFIX})
+     else ()
+         # Regular boost_python
+         set(BOOST_PYTHON_NAME_LIST python;python-mt;python-py27;python27-mt;python27)
+diff --git a/pulsar-client-cpp/python/CMakeLists.txt b/pulsar-client-cpp/python/CMakeLists.txt
+index 70b5bc130ae..813f1e9101e 100644
+--- a/pulsar-client-cpp/python/CMakeLists.txt
++++ b/pulsar-client-cpp/python/CMakeLists.txt
+@@ -48,11 +48,16 @@ if (NOT DEFINED ${Boost_PYTHON38-MT_LIBRARY})
+   set(Boost_PYTHON38-MT_LIBRARY ${Boost_PYTHON38_LIBRARY})
+ endif()
+ 
++if (NOT DEFINED ${Boost_PYTHON39-MT_LIBRARY})
++  set(Boost_PYTHON39-MT_LIBRARY ${Boost_PYTHON39_LIBRARY})
++endif()
++
+ # Try all possible boost-python variable namings
+ set(PYTHON_WRAPPER_LIBS ${Boost_PYTHON_LIBRARY} ${Boost_PYTHON3_LIBRARY}
+                         ${Boost_PYTHON27-MT_LIBRARY} ${Boost_PYTHON37-MT_LIBRARY}
+                         ${Boost_PYTHON34_LIBRARY} ${Boost_PYTHON35_LIBRARY}
+-                        ${Boost_PYTHON36_LIBRARY} ${Boost_PYTHON38_LIBRARY})
++                        ${Boost_PYTHON36_LIBRARY} ${Boost_PYTHON38_LIBRARY}
++                        ${Boost_PYTHON39_LIBRARY})
+ 
+ if (APPLE)
+     set(PYTHON_WRAPPER_LIBS ${PYTHON_WRAPPER_LIBS}
+-- 
+2.30.0
+

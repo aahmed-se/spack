@@ -21,26 +21,30 @@ class Libpulsar(CMakePackage):
 
     variant('python', default=False, description='Build the Python client')
 
+    patch('0001-Add-support-for-python-39.patch')
+
     depends_on('zstd')
     depends_on('openssl')
-    depends_on('snappy')
-    depends_on('boost')
-    depends_on('protobuf')
+    depends_on('snappy~shared')
+    depends_on('boost~shared')
+    depends_on('protobuf~shared')
     depends_on('pkg-config')
     depends_on('openssl')
     depends_on('cmake@3.14:', type='build')
 
     extends('python'          , when='+python')
 
-    depends_on('boost+python' , when='+python')
-    depends_on('python'       , type=('build'), when='+python')
-    depends_on('py-setuptools', type=('build'), when='+python')
-    depends_on('py-wheel'     , type=('build'), when='+python')
+    depends_on('boost+python~shared' , when='+python')
+    depends_on('python~shared' , type=('build'), when='+python')
+    depends_on('py-setuptools' , type=('build'), when='+python')
+    depends_on('py-wheel'      , type=('build'), when='+python')
 
     root_cmakelists_dir = 'pulsar-client-cpp'
+    build_directory = 'pulsar-client-cpp'
 
     def cmake_args(self):
-        args = ["-DBUILD_TESTS=OFF"]
+        args = ["-DBUILD_TESTS=OFF",
+                "LINK_STATIC=ON"]
         return args
 
     @run_after('build')
@@ -49,3 +53,9 @@ class Libpulsar(CMakePackage):
             with working_dir(os.path.join(self.stage.source_path, 'pulsar-client-cpp/python')):
                 python = self.spec['python'].command
                 python('setup.py', 'bdist_wheel')
+
+    @run_after('install')
+    def archvive_python_whl(self):
+        if '+python' in self.spec:
+            with working_dir(os.path.join(self.stage.source_path, 'pulsar-client-cpp/python')):
+                install('dist/*.whl', prefix)
